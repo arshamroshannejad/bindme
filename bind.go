@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"io"
 	"net/http"
 	"strings"
@@ -47,7 +48,8 @@ func ReadJson(r *http.Request, dst interface{}) error {
 	if err = d.Decode(&struct{}{}); err != io.EOF {
 		return ErrDuplicateJson
 	}
-	return nil
+	v := validator.New()
+	return v.Struct(dst)
 }
 
 func WriteJson(w http.ResponseWriter, status int, v interface{}, headers http.Header) error {
