@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-playground/form"
 	"github.com/go-playground/validator/v10"
 	"io"
 	"net/http"
@@ -47,6 +48,21 @@ func ReadJson(r *http.Request, dst interface{}) error {
 	}
 	if err = d.Decode(&struct{}{}); err != io.EOF {
 		return ErrDuplicateJson
+	}
+	v := validator.New()
+	return v.Struct(dst)
+}
+
+func ReadForm(r *http.Request, dst interface{}, maxMemory int64) error {
+	if err := r.ParseForm(); err != nil {
+		return err
+	}
+	if err := r.ParseMultipartForm(maxMemory << 20); err != nil {
+		return err
+	}
+	f := form.NewDecoder()
+	if err := f.Decode(dst, r.Form); err != nil {
+		return err
 	}
 	v := validator.New()
 	return v.Struct(dst)
