@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/form"
 	"github.com/go-playground/validator/v10"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"strings"
 )
@@ -53,11 +54,8 @@ func ReadJson(r *http.Request, dst interface{}) error {
 	return v.Struct(dst)
 }
 
-func ReadForm(r *http.Request, dst interface{}, maxMemory int64) error {
+func ReadForm(r *http.Request, dst interface{}) error {
 	if err := r.ParseForm(); err != nil {
-		return err
-	}
-	if err := r.ParseMultipartForm(maxMemory << 20); err != nil {
 		return err
 	}
 	f := form.NewDecoder()
@@ -66,6 +64,18 @@ func ReadForm(r *http.Request, dst interface{}, maxMemory int64) error {
 	}
 	v := validator.New()
 	return v.Struct(dst)
+}
+
+func ReadFile(r *http.Request, fileName string, maxFileSize int64) (multipart.File, *multipart.FileHeader, error) {
+	if err := r.ParseMultipartForm(maxFileSize << 20); err != nil {
+		return nil, nil, err
+	}
+	file, handler, err := r.FormFile(fileName)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer file.Close()
+	return file, handler, nil
 }
 
 func WriteJson(w http.ResponseWriter, status int, v interface{}, headers http.Header) error {
