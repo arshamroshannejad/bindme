@@ -72,6 +72,9 @@ func ReadFile(r *http.Request, fileName string, maxFileSize int64) (multipart.Fi
 	}
 	file, handler, err := r.FormFile(fileName)
 	if err != nil {
+		if errors.Is(err, http.ErrMissingFile) {
+			return nil, nil, fmt.Errorf("missing required field: %s", fileName)
+		}
 		return nil, nil, err
 	}
 	defer file.Close()
