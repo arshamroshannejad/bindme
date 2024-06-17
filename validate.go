@@ -6,7 +6,7 @@ type Validator struct {
 	Errors Map
 }
 
-func (v *Validator) New() *Validator {
+func New() *Validator {
 	return &Validator{
 		Errors: make(Map),
 	}
