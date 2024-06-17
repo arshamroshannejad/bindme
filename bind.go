@@ -12,6 +12,11 @@ import (
 	"strings"
 )
 
+const (
+	ContentType     = "Content-Type"
+	ContentTypeJson = "application/json"
+)
+
 var (
 	ErrEOF           = errors.New("body must not be empty")
 	ErrInvalidJson   = errors.New("body contains badly-formed JSON")
@@ -89,7 +94,7 @@ func WriteJson(w http.ResponseWriter, status int, v interface{}, headers http.He
 	for k, v := range headers {
 		w.Header()[k] = v
 	}
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(ContentType, ContentTypeJson)
 	w.WriteHeader(status)
 	w.Write(data)
 	return nil
