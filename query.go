@@ -1,36 +1,36 @@
 package bindme
 
 import (
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
 )
 
-func ReadString(qs url.Values, key, defaultValue string) string {
-	v := qs.Get(key)
-	if v == "" {
+func (v *Validator) ReadString(qs url.Values, key, defaultValue string) string {
+	k := qs.Get(key)
+	if k == "" {
 		return defaultValue
 	}
-	return v
+	return k
 }
 
-func ReadCSV(qs url.Values, key string, defaultValue []string) []string {
-	v := qs.Get(key)
-	if v == "" {
+func (v *Validator) ReadCSV(qs url.Values, key string, defaultValue []string) []string {
+	k := qs.Get(key)
+	if k == "" {
 		return defaultValue
 	}
-	return strings.Split(v, ",")
+	return strings.Split(k, ",")
 }
 
-func ReadInt(qs url.Values, key string, defaultValue int) (int, error) {
-	v := qs.Get(key)
-	if v == "" {
-		return defaultValue, nil
+func (v *Validator) ReadInt(qs url.Values, key string, defaultValue int) int {
+	k := qs.Get(key)
+	if k == "" {
+		return defaultValue
 	}
-	i, err := strconv.Atoi(v)
+	i, err := strconv.Atoi(k)
 	if err != nil {
-		return defaultValue, fmt.Errorf("key %s: must be an integer", key)
+		v.Add(key, "must be an integer value")
+		return defaultValue
 	}
-	return i, nil
+	return i
 }
