@@ -14,14 +14,6 @@ func (v *Validator) ReadString(qs url.Values, key, defaultValue string) string {
 	return k
 }
 
-func (v *Validator) ReadCSV(qs url.Values, key string, defaultValue []string) []string {
-	k := qs.Get(key)
-	if k == "" {
-		return defaultValue
-	}
-	return strings.Split(k, ",")
-}
-
 func (v *Validator) ReadInt(qs url.Values, key string, defaultValue int) int {
 	k := qs.Get(key)
 	if k == "" {
@@ -33,4 +25,12 @@ func (v *Validator) ReadInt(qs url.Values, key string, defaultValue int) int {
 		return defaultValue
 	}
 	return i
+}
+
+func (v *Validator) ReadCSV(qs url.Values, key string, defaultValue []string) []string {
+	k := qs.Get(key)
+	if k == "" {
+		return defaultValue
+	}
+	return strings.Split(k, ",")
 }
