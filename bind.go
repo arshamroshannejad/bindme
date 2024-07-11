@@ -13,17 +13,22 @@ import (
 )
 
 const (
-	ContentType     = "Content-Type"
-	ContentTypeJson = "application/json"
+	contentType     = "Content-Type"
+	contentTypeJson = "application/json"
 )
 
 var (
 	ErrEOF           = errors.New("body must not be empty")
 	ErrInvalidJson   = errors.New("body contains badly-formed JSON")
 	ErrDuplicateJson = errors.New("body contains only one JSON object")
+	ErrNotJson       = errors.New("body content-type header is not application/json")
 )
 
 func ReadJson(r *http.Request, dst interface{}) error {
+	contentType := r.Header.Get(contentType)
+	if contentType != "" && strings.ToLower(contentType) != contentTypeJson {
+		return ErrNotJson
+	}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
 	err := d.Decode(dst)
@@ -91,10 +96,12 @@ func WriteJson(w http.ResponseWriter, status int, v interface{}, headers http.He
 	if err != nil {
 		return err
 	}
-	for k, v := range headers {
-		w.Header()[k] = v
+	if len(headers) > 0 {
+		for k, v := range headers {
+			w.Header()[k] = v
+		}
 	}
-	w.Header().Set(ContentType, ContentTypeJson)
+	w.Header().Set(contentType, contentTypeJson)
 	w.WriteHeader(status)
 	w.Write(data)
 	return nil
