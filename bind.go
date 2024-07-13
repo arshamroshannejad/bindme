@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	contentType     = "Content-Type"
+	contentType     = "content-type"
 	contentTypeJson = "application/json"
 )
 
