@@ -76,13 +76,16 @@ func ReadForm(r *http.Request, dst interface{}) error {
 	return v.Struct(dst)
 }
 
-func ReadFile(r *http.Request, fileName string, maxFileSize int64) (multipart.File, *multipart.FileHeader, error) {
+func ReadFile(r *http.Request, fileName string, required bool, maxFileSize int64) (multipart.File, *multipart.FileHeader, error) {
 	if err := r.ParseMultipartForm(maxFileSize << 20); err != nil {
 		return nil, nil, err
 	}
 	file, handler, err := r.FormFile(fileName)
 	if err != nil {
 		if errors.Is(err, http.ErrMissingFile) {
+			if required == false {
+				return file, handler, nil
+			}
 			return nil, nil, fmt.Errorf("missing required field: %s", fileName)
 		}
 		return nil, nil, err
